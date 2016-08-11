@@ -1,12 +1,8 @@
-const { graphql } = require('graphql');
-const readline = require('readline');
+const graphqlHTTP = require('express-graphql');
+const express = require('express');
 
+const app = express();
 const mySchema = require('./schema/main');
-
-const rli = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
 
 const { MongoClient } = require('mongodb');
 const assert = require('assert');
@@ -17,10 +13,12 @@ MongoClient.connect(MONGO_URL, (err, db) => {
   assert.equal(null, err);
   console.log('Connected to MongoDB server');
 
-  rli.question('Client Request: ', inputQuery => {
-    graphql(mySchema, inputQuery, {}, { db }).then(result => {
-      console.log('Server Answer :', result.data);
-      db.close(() => rli.close());
-    });
-  });
+  app.use('/graphql', graphqlHTTP({
+    schema: mySchema,
+    context: { db }
+  }));
+
+  app.listen(3000, () =>
+    console.log('Running Express.js on port 3000')
+  );
 });
