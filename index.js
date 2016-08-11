@@ -4,6 +4,8 @@ const graphqlHTTP = require('express-graphql');
 const express = require('express');
 
 const app = express();
+app.use(express.static('public'));
+
 const mySchema = require('./schema/main');
 const MONGO_URL = 'mongodb://localhost:27017/test';
 
