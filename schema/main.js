@@ -8,6 +8,17 @@ const {
   GraphQLEnumType
 } = require('graphql');
 
+const fs = require('fs');
+
+const readLastLinePromise = path => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, (err, data) => {
+      if (err) throw reject(err);
+      resolve(data.toString().trim().split('\n').slice(-1)[0]);
+    });
+  });
+};
+
 const roll = () => Math.floor(6 * Math.random()) + 1;
 
 const toTitleCase = str => {
@@ -69,6 +80,10 @@ const EmployeeType = new GraphQLObjectType({
 const queryType = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
+    lastQuote: {
+      type: GraphQLString,
+      resolve: () => readLastLinePromise('data/quotes')
+    },
     exampleEmployee: {
       type: EmployeeType,
       resolve: () => exampleEmployee
@@ -103,8 +118,32 @@ const queryType = new GraphQLObjectType({
   }
 });
 
+const appendLinePromise = (path, line) => {
+  return new Promise((resolve, reject) => {
+    fs.appendFile(path, line, err => {
+      if (err) throw reject(err);
+      resolve(line);
+    });
+  });
+};
+
+const mutationType = new GraphQLObjectType({
+  name: 'RootMutation',
+  fields: {
+    addQuote: {
+      type: GraphQLString,
+      args: {
+        body: { type: GraphQLString }
+      },
+      resolve: (_, args) =>
+        appendLinePromise('data/quotes', args.body)
+    }
+  }
+});
+
 const mySchema = new GraphQLSchema({
-  query: queryType
+  query: queryType,
+  mutation: mutationType
 });
 
 module.exports = mySchema;
