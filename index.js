@@ -1,12 +1,10 @@
+const { MongoClient } = require('mongodb');
+const assert = require('assert');
 const graphqlHTTP = require('express-graphql');
 const express = require('express');
 
 const app = express();
 const mySchema = require('./schema/main');
-
-const { MongoClient } = require('mongodb');
-const assert = require('assert');
-
 const MONGO_URL = 'mongodb://localhost:27017/test';
 
 MongoClient.connect(MONGO_URL, (err, db) => {
