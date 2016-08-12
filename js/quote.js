@@ -13,7 +13,14 @@ class Quote extends React.Component {
 }
 
 Quote = Relay.createContainer(Quote, {
-  fragments: {}
+  fragments: {
+    quote: () => Relay.QL `
+      fragment OneQuote on Quote {
+        text
+        author
+      }
+    `
+  }
 });
 
 export default Quote;
