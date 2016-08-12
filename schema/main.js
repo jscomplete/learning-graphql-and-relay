@@ -8,6 +8,13 @@ const {
   GraphQLEnumType
 } = require('graphql');
 
+const {
+  connectionDefinitions,
+  connectionArgs,
+  connectionFromArray,
+  connectionFromPromisedArray
+} = require('graphql-relay');
+
 const QuoteType = new GraphQLObjectType({
   name: 'Quote',
   fields: {
@@ -20,14 +27,23 @@ const QuoteType = new GraphQLObjectType({
   }
 });
 
+const { connectionType: QuotesConnectionType } =
+  connectionDefinitions({
+    name: 'Quote',
+    nodeType: QuoteType
+  });
+
 const QuotesLibraryType = new GraphQLObjectType({
   name: 'QuotesLibrary',
   fields: {
-    allQuotes: {
-      type: new GraphQLList(QuoteType),
+    quotesConnection: {
+      type: QuotesConnectionType,
       description: 'A list of the quotes in the database',
-      resolve: (_, args, { db }) =>
-        db.collection('quotes').find().toArray()
+      args: connectionArgs,
+      resolve: (_, args, { db }) => connectionFromPromisedArray(
+        db.collection('quotes').find().toArray(),
+        args
+      )
     }
   }
 });
