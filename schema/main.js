@@ -20,14 +20,27 @@ const QuoteType = new GraphQLObjectType({
   }
 });
 
-const queryType = new GraphQLObjectType({
-  name: 'RootQuery',
+const QuotesLibraryType = new GraphQLObjectType({
+  name: 'QuotesLibrary',
   fields: {
     allQuotes: {
       type: new GraphQLList(QuoteType),
       description: 'A list of the quotes in the database',
       resolve: (_, args, { db }) =>
         db.collection('quotes').find().toArray()
+    }
+  }
+});
+
+const quotesLibrary = {};
+
+const queryType = new GraphQLObjectType({
+  name: 'RootQuery',
+  fields: {
+    quotesLibrary: {
+      type: QuotesLibraryType,
+      description: 'The Quotes Library',
+      resolve: () => quotesLibrary
     }
   }
 });

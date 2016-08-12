@@ -46,13 +46,3 @@ ReactDOM.render(
   />,
   document.getElementById('react')
 );
-
-console.log(
-  Relay.QL `query AllQuotes {
-    allQuotes {
-      id
-      text
-      author
-    }
-  }`
-);
